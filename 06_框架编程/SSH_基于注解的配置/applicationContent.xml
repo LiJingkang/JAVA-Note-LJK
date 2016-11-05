@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:task="http://www.springframework.org/schema/task" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd        
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+          http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+    <aop:aspectj-autoproxy /> 
+        <!-- 声明自动为 spring 容器中哪些配置 @aspectJ 切面的 bean 创建代理 --> 
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+        <!-- 指定使用哪个事务管理器  -->
+        <!-- 就是支持mvc注解的，说白了就是使 Controller 中可以使用 MVC 的各种注解 -->
+
+    <context:property-placeholder location="classpath:config.properties"
+        ignore-unresolvable="true" />
+        <!-- 期望 -->
+                <!-- 能不能有一种解决方案可以方便我们在一个阶段内不需要频繁书写一个参数的值，
+                     而在不同阶段间又可以方便的切换参数配置信息 -->
+        <!-- 解决 -->
+                <!-- spring3中提供了一种简便的方式就是 context:property-placeholder/ 元素 -->
+        <!-- 应用 -->
+                <!-- 这样一来就可以为spring配置的bean的属性设置值了 -->
+                    <!-- 比如 -->
+                    <!-- spring有一个jdbc数据源的类DriverManagerDataSource
+                            在配置文件里这么定义bean： -->
+                            <!--
+                                <bean id="testDataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+                                    <property name="driverClassName" value="${test.jdbc.driverClassName}"/>
+                                    <property name="url" value="${test.jdbc.url}"/>
+                                    <property name="username" value="${test.jdbc.username}"/>
+                                    <property name="password" value="${test.jdbc.password}"/>
+                                </bean> 
+                            -->
+
+    <context:property-placeholder location="classpath:rabbitmq.properties"
+        ignore-unresolvable="true" />
+        
+
+    <context:component-scan base-package="com.newings" />
+    <!-- 基本包 -->
+    <!-- 表示扫描指定的包 "com.newings"  -->
+    <!-- 将注解的类注册为 spring 容器中的bean -->
+    <!-- 那么此时我们在 xml 文件中就不需要定义bean -->
+    <!-- 实现 xml 文件的零配置 -->
+            <!-- 原来有这些配置 -->
+            <!-- <context:component-scan base-package="com.newings.service" /> -->
+            <!-- <context:component-scan base-package="com.newings.configuration" /> -->
+            <!-- <context:component-scan base-package="com.newings.util" /> -->
+    <context:component-scan base-package="org.apache.ibatis.mapping" />
+
+</beans>

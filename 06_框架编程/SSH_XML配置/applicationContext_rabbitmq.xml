@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+    xsi:schemaLocation="
+            http://www.springframework.org/schema/beans
+                http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+                http://www.springframework.org/schema/context/spring-context.xsd
+            http://www.springframework.org/schema/rabbit
+                http://www.springframework.org/schema/rabbit/spring-rabbit-1.5.xsd">
+
+    <context:component-scan base-package="com.newings.service.message" />
+
+    <bean id="jsonMessageConverter" class="com.newings.service.message.JsonMessageConverter" />
+
+    <rabbit:connection-factory id="rabbitConnectionFactory"
+        host="${rabbitmq.host}" port="${rabbitmq.port}" username="nwt-jc"
+        password="rxJ$7FW0" channel-cache-size="60" />
+
+    <bean id="poolTaskExecutor"
+        class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="60" />
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy" />
+        </property>
+    </bean>
+
+    <rabbit:admin connection-factory="rabbitConnectionFactory"
+        id="rabbitAdmin" />
+
+    <!-- exchange start -->
+    <rabbit:topic-exchange name="${prisonId}_chatStatus"
+        durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <rabbit:binding queue="nwt-jc-chatStatus" pattern="#"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+    <rabbit:topic-exchange name="${prisonId}_terminalStatus"
+        durable="true" auto-delete="false">
+        <rabbit:bindings>
+            <rabbit:binding queue="nwt-jc-terminalStatus" pattern="#"/>
+        </rabbit:bindings>
+    </rabbit:topic-exchange>
+    <rabbit:topic-exchange name="${prisonId}_trigger"
+        durable="true" auto-delete="false">
+    </rabbit:topic-exchange>
+    <!-- exchange end -->
+
+    <rabbit:queue name="nwt-jc-chatStatus" />
+    <bean id="chatStatusConsumer" class="com.newings.service.message.ChatStatusConsumer" />
+
+    <rabbit:queue name="nwt-jc-terminalStatus" />
+    <bean id="terminalStatusConsumer" class="com.newings.service.message.TerminalStatusConsumer" />
+
+    <!-- listerner -->
+    <rabbit:listener-container prefetch="5"
+        concurrency="5" task-executor="poolTaskExecutor" connection-factory="rabbitConnectionFactory"
+        message-converter="jsonMessageConverter" xmlns="http://www.springframework.org/schema/rabbit"
+        auto-startup="true">
+        <rabbit:listener ref="chatStatusConsumer" method="receiveMessage"
+            queues="nwt-jc-chatStatus" />
+        <rabbit:listener ref="terminalStatusConsumer" method="receiveMessage"
+            queues="nwt-jc-terminalStatus" />
+    </rabbit:listener-container>
+    <!-- listerner end -->
+
+    <!-- terminalStatus producer -->
+    <rabbit:template exchange="${prisonId}_terminalStatus"
+        id="terminalStatusTemplate" connection-factory="rabbitConnectionFactory"
+        message-converter="jsonMessageConverter" />
+    <bean id="terminalStatusProducer" class="com.newings.service.message.TerminalStatusProducer"
+        lazy-init="true">
+        <property name="rabbitTemplate">
+            <ref bean="terminalStatusTemplate" />
+        </property>
+    </bean>
+    <!-- terminalStatus producer end -->
+
+
+    <!-- trigger producer -->
+    <rabbit:template exchange="${prisonId}_trigger" id="triggerTemplate"
+        connection-factory="rabbitConnectionFactory" message-converter="jsonMessageConverter" />
+    <bean id="triggerProducer" class="com.newings.service.message.TriggerProducer"
+        lazy-init="true">
+        <property name="rabbitTemplate">
+            <ref bean="triggerTemplate" />
+        </property>
+    </bean>
+
+    <!-- trigger producer -->
+    <!-- producer end -->
+
+</beans>

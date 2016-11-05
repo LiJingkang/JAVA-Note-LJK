@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mybatis="http://mybatis.org/schema/mybatis-spring" xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://mybatis.org/schema/mybatis-spring
+        http://mybatis.org/schema/mybatis-spring.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="criminalSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="criminalDataSource" />
+        <property name="plugins">
+            <array>
+                <bean class="com.newings.mybatis.PageHelper">
+                    <property name="properties">
+                        <value>
+                            dialect=oracle
+                            reasonable=true
+                            rowBoundsWithCount=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="criminalMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.newings.dao.oracle" />
+        <property name="sqlSessionFactoryBeanName" value="criminalSqlSessionFactory" />
+    </bean>
+
+    <bean id="criminalDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${database.criminal.driverClassName}" />
+        <property name="url" value="${database.criminal.url}" />
+        <property name="username" value="${database.criminal.username}" />
+        <property name="password" value="${database.criminal.password}" />
+    </bean>
+
+    <bean id="criminalTransactionManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="criminalDataSource" />
+    </bean>
+
+    <bean id="scmSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="scmDataSource" />
+        <property name="plugins">
+            <array>
+                <bean class="com.newings.mybatis.PageHelper">
+                    <property name="properties">
+                        <value>
+                            dialect=sqlserver
+                            reasonable=true
+                            rowBoundsWithCount=true
+                        </value>
+                    </property>
+                </bean>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="scmMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.newings.dao.sqlserver" />
+        <property name="sqlSessionFactoryBeanName" value="scmSqlSessionFactory" />
+    </bean>
+
+    <bean id="scmDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${database.scm.driverClassName}" />
+        <property name="url" value="${database.scm.url}" />
+        <property name="username" value="${database.scm.username}" />
+        <property name="password" value="${database.scm.password}" />
+    </bean>
+
+    <bean id="scmTransactionManager"
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="scmDataSource" />
+    </bean>
+
+
+</beans>
+
+
+    在Spring中
+        <context:annotation-config/>
+            表示在自动装配时，我们可以使用注解的方式 
+            例如:
+                @Autowired，但是此时在xml文件中仍需要bean配置，只不过此时代替了bean的property
+
+        <context:component-scan base-package=""/>
+            表示扫描指定的包，将注解的类注册为spring容器中的bean，
+            那么此时我们在xml文件中就不需要定义bean，实现xml文件的零配置
+
+        <mvc:annotation-driven/>
+            表示在SpringMVC中注册了 DefaultAnnotationHandlerMapping 与 AnnotationMethodHandlerAdapter 
+            两个bean，
+            表示为@controller、@requestMapping做好准备工作，
+            但是 
+                此时被注解的bean并没有被加入到spring容器中，
+            此时需要用<context:component-scan base-package=""/>
+                扫描并注册bean，
+            因此我们在SpringMVC中出现将
+                <mvc:annotation-driven/>、
+                <context:component-scan base-package=""/>
+                一起使用。
