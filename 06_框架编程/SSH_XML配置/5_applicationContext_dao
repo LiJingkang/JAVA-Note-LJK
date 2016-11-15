@@ -1,17 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
-    xmlns:mybatis="http://mybatis.org/schema/mybatis-spring" xmlns:tx="http://www.springframework.org/schema/tx"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans.xsd
-        http://www.springframework.org/schema/context
-        http://www.springframework.org/schema/context/spring-context.xsd
-        http://mybatis.org/schema/mybatis-spring
-        http://mybatis.org/schema/mybatis-spring.xsd
-        http://www.springframework.org/schema/tx
-        http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
-
-    <tx:annotation-driven transaction-manager="transactionManager" />
+    <!-- Criminal  BasicDataSource -->
+    <bean id="criminalDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${database.criminal.driverClassName}" />
+        <property name="url" value="${database.criminal.url}" />
+        <property name="username" value="${database.criminal.username}" />
+        <property name="password" value="${database.criminal.password}" />
+    </bean>
 
     <!-- 手动配置XML文件的路径 -->
     <bean id="criminalSqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -35,19 +28,17 @@
     <bean id="criminalMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.newings.dao.oracle" />
         <property name="sqlSessionFactoryBeanName" value="criminalSqlSessionFactory" />
-    </bean>
+    </bean>    
 
-    配置数据库
-    <bean id="criminalDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
-        <property name="driverClassName" value="${database.criminal.driverClassName}" />
-        <property name="url" value="${database.criminal.url}" />
-        <property name="username" value="${database.criminal.username}" />
-        <property name="password" value="${database.criminal.password}" />
-    </bean>
+    <!-- 事务管理 -->
 
-    <bean id="criminalTransactionManager"
-        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="criminalDataSource" />
+————————————————————————————————————————————————————————————————————
+    <!-- scm DataSource -->
+    <bean id="scmDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+        <property name="driverClassName" value="${database.scm.driverClassName}" />
+        <property name="url" value="${database.scm.url}" />
+        <property name="username" value="${database.scm.username}" />
+        <property name="password" value="${database.scm.password}" />
     </bean>
 
     <!-- 手动配置XML文件的路径 -->
@@ -68,29 +59,18 @@
         </property>
     </bean>
 
-    
+    <!-- 映射接口类文件(.java) --> 
     <bean id="scmMapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.newings.dao.sqlserver" />
         <property name="sqlSessionFactoryBeanName" value="scmSqlSessionFactory" />
     </bean>
 
-
-
-    <bean id="scmDataSource" class="org.apache.commons.dbcp2.BasicDataSource">
-        <property name="driverClassName" value="${database.scm.driverClassName}" />
-        <property name="url" value="${database.scm.url}" />
-        <property name="username" value="${database.scm.username}" />
-        <property name="password" value="${database.scm.password}" />
-    </bean>
-
+    <!-- 事务管理  -->
     <bean id="scmTransactionManager"
         class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="scmDataSource" />
     </bean>
-
-
-</beans>
-
+—————————————————————————————————————————————————————————————————————————
 
     在Spring中
         <context:annotation-config/>

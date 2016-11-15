@@ -25,16 +25,16 @@ maven pom文件详解
 
     在应用程序用使用多个存储库
     <repositories>    
-    <repository>      
-       <id>Ibiblio</id>      
-       <name>Ibiblio</name>      
-       <url>http://www.ibiblio.org/maven/</url>    
-    </repository>    
-    <repository>      
-       <id>PlanetMirror</id>      
-       <name>Planet Mirror</name>      
-       <url>http://public.planetmirror.com/pub/maven/</url>    
-    </repository> 
+        <repository>      
+            <id>Ibiblio</id>      
+            <name>Ibiblio</name>      
+            <url>http://www.ibiblio.org/maven/</url>    
+        </repository>    
+        <repository>      
+            <id>PlanetMirror</id>      
+            <name>Planet Mirror</name>      
+            <url>http://public.planetmirror.com/pub/maven/</url>    
+        </repository> 
     </repositories>
 
 

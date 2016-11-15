@@ -67,11 +67,11 @@
     这种方式简单，用的也比较多。
         例如：
             <dependencies>
-            <dependency>
-            <groupId>org.test.autodeploy</groupId>   // com.newings.jc
-            <artifactId>org.test.autodeploy</artifactId> // jc-common  依赖的项目
-            <version>0.0.1-SNAPSHOT</version>  // 版本号  // 
-            </dependency>
+                <dependency>
+                    <groupId>org.test.autodeploy</groupId>   // com.newings.jc
+                    <artifactId>org.test.autodeploy</artifactId> // jc-common  依赖的项目
+                    <version>0.0.1-SNAPSHOT</version>  // 版本号  // 
+                </dependency>
             </dependencies>
 * pom jar 
 
